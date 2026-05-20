@@ -94,7 +94,7 @@ The web UI also supports legacy `Viable` / `NonViable` labels, but the current s
 | 2 | VGG16 | 224×224 | 138M | High accuracy |
 | 3 | VGG19 | 224×224 | 144M | Deeper VGG |
 | 4 | ResNet-18 | 224×224 | 11M | Lightweight |
-| 5 | **ResNet-50** ★ | 224×224 | 25M | **Primary model** |
+| 5 | ResNet-50 | 224×224 | 25M | Primary proposed model |
 | 6 | ResNet-101 | 224×224 | 44M | Deeper residual |
 | 7 | ResNet-152 | 224×224 | 60M | Deepest residual |
 | 8 | DenseNet-121 | 224×224 | 8M | Dense connectivity |
@@ -103,7 +103,7 @@ The web UI also supports legacy `Viable` / `NonViable` labels, but the current s
 | 11 | MobileNetV2 | 224×224 | 3.4M | Lightweight |
 | 12 | EfficientNet-B0 | 224×224 | 5.3M | Efficient scaling |
 
-★ ResNet-50 is the default in the Flask app (FYP2 §5.5 "Primary Proposed Model").
+ResNet-152 is the current default model because it has the best observed evaluation performance in `results/` (`accuracy=0.981074`, `macro_f1=0.981002`).
 
 ---
 
@@ -124,7 +124,7 @@ All architectures support Grad-CAM heatmap generation to highlight regions influ
 
 ## 🌐 Streamlit Community Cloud Deployment
 
-This project includes a root `streamlit_app.py` entrypoint for Streamlit Community Cloud. The cloud deployment is intended to publish the ResNet-50 demo model only, while larger local-only assets remain excluded by `.gitignore`.
+This project includes a root `streamlit_app.py` entrypoint for Streamlit Community Cloud. The cloud deployment can publish all available `saved_models/*_best.pt` models and matching class files.
 
 Deploy steps:
 
@@ -141,7 +141,15 @@ streamlit_app.py
 6. In advanced settings, use Python 3.12.
 7. Deploy the app and share the generated `streamlit.app` URL.
 
-Cloud note: the public app can classify uploaded images using `saved_models/resnet50_best.pt`. Full local evaluation requires the `data/embryo/` dataset, which is intentionally kept local because it is large.
+Cloud note: several model files are larger than GitHub's normal 100MB file limit. Use Git LFS before pushing all models:
+
+```bash
+git lfs install
+git lfs track "saved_models/*.pt"
+git add .gitattributes saved_models/*_best.pt saved_models/*_classes.txt
+```
+
+Full local evaluation requires the `data/embryo/` dataset, which is intentionally kept local because it is large.
 
 ---
 

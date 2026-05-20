@@ -36,8 +36,8 @@ LEGACY_PATHS = {
 }
 SAVED_MODELS_DIR = "saved_models"
 
-# Default = resnet50 (FYP2 §5.5 "Primary Proposed Model")
-DEFAULT_ARCH = "resnet50"
+# Default = best observed model by evaluation accuracy/macro-F1.
+DEFAULT_ARCH = "resnet152"
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -240,7 +240,7 @@ HTML = open(os.path.join(os.path.dirname(__file__), "templates", "index.html")).
 @app.route('/')
 def index():
     avail   = available_models()
-    default = DEFAULT_ARCH if DEFAULT_ARCH in avail else (list(avail.keys())[0] if avail else "resnet50")
+    default = DEFAULT_ARCH if DEFAULT_ARCH in avail else (list(avail.keys())[0] if avail else DEFAULT_ARCH)
     return render_template_string(HTML,
         archs=SUPPORTED_ARCHS,
         available=list(avail.keys()),

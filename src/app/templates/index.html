@@ -81,13 +81,13 @@ footer{text-align:center;padding:28px;color:#555;font-size:.88rem}
       {% for a in archs %}
       <option value="{{ a }}" {% if a==default_arch %}selected{% endif %}
         {% if a not in available %}style="color:#777"{% endif %}>
-        {{ a }}{% if a==default_arch %} ★{% endif %}{% if a not in available %} (not trained){% endif %}
+        {{ a }}{% if a not in available %} (not trained){% endif %}
       </option>
       {% endfor %}
     </select>
     <span class="status-dot" id="statusDot"></span>
     <span id="statusText" style="color:#aaa;font-size:.88rem"></span>
-    <span style="margin-left:auto;color:#666;font-size:.82rem">★ = highest performance (ResNet-50)</span>
+    <span style="margin-left:auto;color:#666;font-size:.82rem">Default model: ResNet-152</span>
   </div>
 
   <!-- Tabs -->

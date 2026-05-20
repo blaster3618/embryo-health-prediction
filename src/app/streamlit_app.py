@@ -29,7 +29,7 @@ IMAGENET_STD     = [0.229, 0.224, 0.225]
 SAVED_MODELS_DIR = "saved_models"
 LEGACY_PATHS     = {"resnet18": "resnet18/best.pt", "resnet50": "resnet50/best.pt"}
 CLASSES_DEFAULT  = ["NonViable", "Viable"]
-DEFAULT_ARCH     = "resnet50"
+DEFAULT_ARCH     = "resnet152"
 TEST_DATA_PATH   = "data/embryo/test_data"
 
 # ── helpers ───────────────────────────────────────────────────────────────────
@@ -82,8 +82,7 @@ with st.sidebar:
 
     default_idx = all_archs.index(DEFAULT_ARCH) if DEFAULT_ARCH in all_archs else 0
     arch = st.selectbox("Architecture", all_archs, index=default_idx,
-                        format_func=lambda a: f"{'★ ' if a==DEFAULT_ARCH else ''}{a}"
-                                              f"{'  ✅' if a in avail else '  ❌ (not trained)'}")
+                        format_func=lambda a: f"{a}{'  ✅' if a in avail else '  ❌ (not trained)'}")
     if arch in avail:
         path = find_model_path(arch)
         size = os.path.getsize(path) / 1024 / 1024
@@ -92,7 +91,7 @@ with st.sidebar:
         st.error("Model not trained yet. Run:\n`python src/training/train.py --arch " + arch + "`")
 
     st.markdown("---")
-    st.caption("★ ResNet-50 = primary proposed model (FYP2 §5.5)")
+    st.caption("Default model: ResNet-152")
     device_name = "CUDA ✅" if torch.cuda.is_available() else "CPU"
     st.info(f"Device: {device_name}")
 

@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 venv/
 .venv/
+.tools/
 
 # Runtime artifacts
 logs/
@@ -14,10 +15,10 @@ resnet50/uploads/
 data/
 results/
 
-# Large local model zoo: keep only the deployable primary model.
+# Model weights. Files over 100MB require Git LFS before pushing to GitHub.
 saved_models/*
-!saved_models/resnet50_best.pt
-!saved_models/resnet50_classes.txt
+!saved_models/*_best.pt
+!saved_models/*_classes.txt
 
 # Legacy standalone model weights/results are local-only.
 resnet18/*.pt
