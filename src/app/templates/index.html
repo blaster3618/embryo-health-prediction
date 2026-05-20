@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Embryo Health Prediction</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);min-height:100vh;color:#fff}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+header{text-align:center;padding:40px 0 20px}
+h1{font-size:2.4rem;background:linear-gradient(90deg,#00d4ff,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.subtitle{color:#aaa;font-size:1.05rem}
+.badge{display:inline-block;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.3);padding:5px 14px;border-radius:20px;font-size:.85rem;margin:4px}
+/* model selector bar */
+.model-bar{background:rgba(255,255,255,.06);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px 24px;margin:20px 0;display:flex;align-items:center;flex-wrap:wrap;gap:14px}
+.model-bar label{font-size:.95rem;color:#ccc}
+select{background:#1a1a3a;color:#fff;border:1px solid rgba(0,212,255,.4);border-radius:10px;padding:9px 14px;font-size:.95rem;cursor:pointer;outline:none}
+.status-dot{width:10px;height:10px;border-radius:50%;background:#666;display:inline-block;margin-left:4px}
+.status-dot.loaded{background:#10b981}
+.status-dot.missing{background:#ef4444}
+/* tabs */
+.tabs{display:flex;gap:10px;margin:16px 0}
+.tab-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);padding:11px 28px;border-radius:30px;color:#aaa;cursor:pointer;font-size:.95rem;transition:all .25s}
+.tab-btn:hover{color:#fff;background:rgba(255,255,255,.14)}
+.tab-btn.active{background:linear-gradient(90deg,#00d4ff,#7c3aed);color:#fff;border:none}
+.tab{display:none}.tab.active{display:block}
+/* card */
+.card{background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:28px;margin:16px 0}
+/* upload */
+.upload-zone{border:2px dashed rgba(255,255,255,.25);border-radius:14px;padding:50px;text-align:center;cursor:pointer;transition:all .3s}
+.upload-zone:hover,.upload-zone.drag{border-color:#00d4ff;background:rgba(0,212,255,.05)}
+.upload-icon{font-size:3.5rem;margin-bottom:14px}
+#fileInput{display:none}
+.btn{background:linear-gradient(90deg,#00d4ff,#7c3aed);border:none;padding:13px 36px;font-size:1rem;font-weight:600;color:#fff;border-radius:30px;cursor:pointer;transition:transform .2s,box-shadow .2s;margin-top:16px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,212,255,.3)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-outline{background:transparent;border:1px solid rgba(0,212,255,.5);color:#00d4ff}
+.btn-outline:hover{background:rgba(0,212,255,.1);box-shadow:none}
+/* preview */
+.preview-wrap{display:none;margin-top:18px;text-align:center}
+.preview-img{max-width:260px;max-height:260px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+/* results */
+.results-section{display:none}
+.prediction-label{font-size:2.2rem;font-weight:700;text-align:center;margin:14px 0}
+.viable{color:#10b981}.nonviable{color:#ef4444}
+.prob-row{display:flex;align-items:center;margin:8px 0;gap:10px}
+.prob-name{width:100px;font-weight:600;font-size:.9rem;text-transform:uppercase}
+.prob-bar-bg{flex:1;background:rgba(255,255,255,.1);border-radius:6px;height:22px;overflow:hidden}
+.prob-bar-fill{height:100%;border-radius:6px;transition:width .6s ease}
+.prob-val{width:60px;text-align:right;font-weight:700;font-size:.9rem}
+.gradcam-img{max-width:100%;border-radius:12px;margin-top:10px}
+/* spinner */
+.spinner-wrap{display:none;text-align:center;padding:40px}
+.spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.1);border-top-color:#00d4ff;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* metrics grid */
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:18px 0}
+.metric-card{background:rgba(255,255,255,.07);border-radius:14px;padding:18px;text-align:center}
+.metric-val{font-size:1.8rem;font-weight:700;background:linear-gradient(90deg,#00d4ff,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.metric-lbl{color:#999;font-size:.82rem;margin-top:4px}
+footer{text-align:center;padding:28px;color:#555;font-size:.88rem}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🔬 Embryo Health Prediction</h1>
+    <p class="subtitle">AI-Powered IVF Embryo Viability Classification</p>
+    <div style="margin-top:12px">
+      <span class="badge">🧠 12 CNN Architectures</span>
+      <span class="badge">🎯 Transfer Learning</span>
+      <span class="badge">🔥 Grad-CAM XAI</span>
+    </div>
+  </header>
+
+  <!-- Model selector -->
+  <div class="model-bar">
+    <label>Architecture:</label>
+    <select id="archSelect" onchange="onArchChange()">
+      {% for a in archs %}
+      <option value="{{ a }}" {% if a==default_arch %}selected{% endif %}
+        {% if a not in available %}style="color:#777"{% endif %}>
+        {{ a }}{% if a==default_arch %} ★{% endif %}{% if a not in available %} (not trained){% endif %}
+      </option>
+      {% endfor %}
+    </select>
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusText" style="color:#aaa;font-size:.88rem"></span>
+    <span style="margin-left:auto;color:#666;font-size:.82rem">★ = highest performance (ResNet-50)</span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('classify')">🖼️ Classify Image</button>
+    <button class="tab-btn" onclick="showTab('evaluate')">📊 Evaluate Model</button>
+  </div>
+
+  <!-- Classify Tab -->
+  <div id="tab-classify" class="tab active">
+    <div class="card">
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleDrop(event)">
+        <div class="upload-icon">📤</div>
+        <h3>Upload Embryo Image</h3>
+        <p style="color:#888;margin-top:8px">Drag & drop or click to browse</p>
+        <p style="color:#666;font-size:.85rem;margin-top:4px">PNG · JPG · BMP · TIFF</p>
+        <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(this)">
+      </div>
+      <div class="preview-wrap" id="previewWrap">
+        <img id="previewImg" class="preview-img">
+        <br>
+        <button class="btn" id="predictBtn" onclick="predict()">🔍 Analyse Embryo</button>
+      </div>
+    </div>
+
+    <div class="spinner-wrap" id="spinner"><div class="spinner"></div><p>Analysing...</p></div>
+
+    <div class="results-section" id="results">
+      <div class="card">
+        <h2 style="margin-bottom:16px">📋 Classification Result</h2>
+        <div class="prediction-label" id="predLabel"></div>
+        <p id="inferenceTime" style="text-align:center;color:#777;font-size:.88rem;margin-bottom:16px"></p>
+        <h3 style="margin-bottom:10px">Confidence Scores</h3>
+        <div id="probBars"></div>
+      </div>
+      <div class="card">
+        <h2 style="color:#00d4ff;margin-bottom:10px">🔥 Grad-CAM Explainability</h2>
+        <p style="color:#888;margin-bottom:14px;font-size:.9rem">Highlighted regions show what influenced the model's decision</p>
+        <img id="gradcamImg" class="gradcam-img">
+      </div>
+    </div>
+  </div>
+
+  <!-- Evaluate Tab -->
+  <div id="tab-evaluate" class="tab">
+    <div class="card">
+      <h2 style="margin-bottom:10px">📊 Model Performance Evaluation</h2>
+      <p style="color:#888;margin-bottom:18px">Runs inference on the test dataset and computes comprehensive metrics.</p>
+      <button class="btn" id="evalBtn" onclick="runEval()">🚀 Run Evaluation</button>
+    </div>
+    <div class="spinner-wrap" id="evalSpinner"><div class="spinner"></div><p>Evaluating...</p></div>
+    <div id="evalResults" style="display:none">
+      <div class="card">
+        <h2 style="margin-bottom:6px">📈 Performance Metrics</h2>
+        <p id="evalSamples" style="color:#777;font-size:.88rem;margin-bottom:16px"></p>
+        <div class="metrics-grid" id="metricsGrid"></div>
+      </div>
+      <div class="card">
+        <h2 style="margin-bottom:14px">🔢 Confusion Matrix</h2>
+        <div style="text-align:center"><img id="cmImg" style="max-width:100%;border-radius:12px"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>FYP2 – Embryo Health Prediction System | 12 CNN Architectures | ResNet-50 Default</footer>
+</div>
+
+<script>
+let selectedFile = null;
+const available = {{ available | tojson }};
+
+function onArchChange(){
+  const arch = document.getElementById('archSelect').value;
+  const dot  = document.getElementById('statusDot');
+  const txt  = document.getElementById('statusText');
+  if(available.includes(arch)){
+    dot.className='status-dot loaded'; txt.textContent='Model available';
+  } else {
+    dot.className='status-dot missing'; txt.textContent='Not trained yet – train first';
+  }
+  // clear previous results
+  document.getElementById('results').style.display='none';
+  document.getElementById('evalResults').style.display='none';
+}
+
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if(file && file.type.startsWith('image/')) showPreview(file);
+}
+
+function onFileSelect(inp){
+  if(inp.files[0]) showPreview(inp.files[0]);
+}
+
+function showPreview(file){
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('previewImg').src = e.target.result;
+    document.getElementById('previewWrap').style.display='block';
+    document.getElementById('results').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function isPositiveClass(label){
+  const cls = label.toLowerCase();
+  return cls === 'good' || (cls.includes('viable') && !cls.includes('non'));
+}
+
+async function predict(){
+  if(!selectedFile) return;
+  const arch = document.getElementById('archSelect').value;
+  const fd = new FormData();
+  fd.append('file', selectedFile);
+  fd.append('arch', arch);
+
+  document.getElementById('spinner').style.display='block';
+  document.getElementById('results').style.display='none';
+  document.getElementById('predictBtn').disabled=true;
+
+  const res  = await fetch('/api/predict', {method:'POST', body:fd});
+  const data = await res.json();
+
+  document.getElementById('spinner').style.display='none';
+  document.getElementById('predictBtn').disabled=false;
+
+  if(data.error){ alert('Error: '+data.error); return; }
+
+  const lbl = document.getElementById('predLabel');
+  const isViable = isPositiveClass(data.predicted_class);
+  lbl.textContent = (isViable ? '✅ ' : '❌ ') + data.predicted_class.toUpperCase();
+  lbl.className = 'prediction-label ' + (isViable ? 'viable' : 'nonviable');
+
+  document.getElementById('inferenceTime').textContent =
+    `Confidence: ${(data.confidence*100).toFixed(1)}%  |  Inference: ${data.inference_ms} ms  |  Arch: ${data.arch}`;
+
+  const bars = document.getElementById('probBars');
+  bars.innerHTML = '';
+  for(const [cls, prob] of Object.entries(data.probabilities)){
+    const pct = (prob*100).toFixed(1);
+    const color = isPositiveClass(cls) ? '#10b981' : '#ef4444';
+    bars.innerHTML += `
+      <div class="prob-row">
+        <span class="prob-name">${cls}</span>
+        <div class="prob-bar-bg"><div class="prob-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+        <span class="prob-val">${pct}%</span>
+      </div>`;
+  }
+
+  document.getElementById('gradcamImg').src = 'data:image/png;base64,' + data.gradcam_image;
+  document.getElementById('results').style.display='block';
+}
+
+async function runEval(){
+  const arch = document.getElementById('archSelect').value;
+  document.getElementById('evalSpinner').style.display='block';
+  document.getElementById('evalResults').style.display='none';
+  document.getElementById('evalBtn').disabled=true;
+
+  const res  = await fetch('/api/evaluate', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({arch})
+  });
+  const data = await res.json();
+
+  document.getElementById('evalSpinner').style.display='none';
+  document.getElementById('evalBtn').disabled=false;
+
+  if(data.error){ alert('Error: '+data.error); return; }
+
+  document.getElementById('evalSamples').textContent =
+    `${data.num_samples} test samples  |  Classes: ${data.classes.join(', ')}  |  Architecture: ${data.arch}`;
+
+  const metricDefs = [
+    ['Accuracy',          data.metrics.accuracy+'%'],
+    ['Balanced Acc.',     data.metrics.balanced_accuracy+'%'],
+    ['Precision',         data.metrics.macro_precision+'%'],
+    ['Recall',            data.metrics.macro_recall+'%'],
+    ['F1 Score',          data.metrics.macro_f1+'%'],
+    ['MCC',               data.metrics.mcc],
+    ["Cohen's κ",         data.metrics.cohens_kappa],
+    ['ROC-AUC',           data.metrics.roc_auc],
+  ];
+  const grid = document.getElementById('metricsGrid');
+  grid.innerHTML = metricDefs.map(([l,v])=>
+    `<div class="metric-card"><div class="metric-val">${v}</div><div class="metric-lbl">${l}</div></div>`
+  ).join('');
+
+  document.getElementById('cmImg').src = 'data:image/png;base64,' + data.confusion_matrix_image;
+  document.getElementById('evalResults').style.display='block';
+}
+
+// init status
+onArchChange();
+</script>
+</body>
+</html>

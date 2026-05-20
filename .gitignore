@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Runtime artifacts
+logs/
+uploads/
+resnet18/uploads/
+resnet50/uploads/
+
+# Local datasets and generated outputs
+data/
+results/
+
+# Large local model zoo: keep only the deployable primary model.
+saved_models/*
+!saved_models/resnet50_best.pt
+!saved_models/resnet50_classes.txt
+
+# Legacy standalone model weights/results are local-only.
+resnet18/*.pt
+resnet50/*.pt
+resnet50/*.png
+resnet50/*.csv
+
+# Reports and drafts
+*.pdf
+*.docx
+report_chapters/
+FYP2_High_Standard_Rubric_Aligned.md
+
+# Windows metadata
+*:Zone.Identifier
