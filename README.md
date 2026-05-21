@@ -21,11 +21,9 @@ FYP/
 │       ├── streamlit_app.py      ← Streamlit frontend
 │       └── templates/index.html  ← Flask HTML template
 ├── data/embryo/                  ← Shared image dataset (train/val/test)
-├── resnet18/                     ← Pre-trained ResNet-18 (stand-alone)
 ├── resnet50/                     ← Pre-trained ResNet-50 (stand-alone, default)
 ├── saved_models/                 ← Unified model weights ({arch}_best.pt)
-├── results/                      ← Evaluation outputs per architecture
-└── notebooks/architecture_comparison.ipynb
+└── results/                      ← Evaluation outputs per architecture
 ```
 
 ---
@@ -158,8 +156,6 @@ Full local evaluation requires the `data/embryo/` dataset, which is intentionall
 Pre-trained ResNet-18 and ResNet-50 each have their own self-contained apps:
 
 ```bash
-# Stand-alone ResNet-18 app
-cd resnet18 && python app.py
 
 # Stand-alone ResNet-50 app
 cd resnet50 && python app.py
