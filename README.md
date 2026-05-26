@@ -122,7 +122,7 @@ All architectures support Grad-CAM heatmap generation to highlight regions influ
 
 ## 🌐 Streamlit Community Cloud Deployment
 
-This project includes a root `streamlit_app.py` entrypoint for Streamlit Community Cloud. The cloud deployment can publish all available `saved_models/*_best.pt` models and matching class files.
+This project includes a root `streamlit_app.py` entrypoint for Streamlit Community Cloud. The cloud deployment keeps all 12 model choices available, but model weights are loaded lazily from release assets instead of being cloned through Git LFS.
 
 Deploy steps:
 
@@ -139,12 +139,35 @@ streamlit_app.py
 6. In advanced settings, use Python 3.12.
 7. Deploy the app and share the generated `streamlit.app` URL.
 
-Cloud note: several model files are larger than GitHub's normal 100MB file limit. Use Git LFS before pushing all models:
+### Model weights for cloud
+
+Git LFS bandwidth can block Streamlit before the app starts, so do not deploy `saved_models/*_best.pt` through Git. Upload the 12 weight files to a GitHub Release instead:
 
 ```bash
-git lfs install
-git lfs track "saved_models/*.pt"
-git add .gitattributes saved_models/*_best.pt saved_models/*_classes.txt
+bash scripts/upload_model_release_assets.sh
+```
+
+The upload script only uses `saved_models/*_best.pt`. It does not upload legacy stand-alone files such as `resnet18/best.pt` or `resnet50/best.pt`.
+
+If GitHub CLI is not installed, either install it and run `gh auth login`, or set a token before running the script:
+
+```bash
+export GITHUB_TOKEN=your_token_here
+bash scripts/upload_model_release_assets.sh
+```
+
+The app reads `config/model_manifest.json`, whose default base URL is:
+
+```text
+https://github.com/blaster3618/embryo-health-prediction/releases/download/model-weights-v1
+```
+
+At runtime, the selected model is downloaded into `.model_cache/` only when the user first selects it. Local development still uses real files under `saved_models/` when they exist.
+
+If you host weights somewhere else, set this Streamlit secret or environment variable:
+
+```toml
+MODEL_BASE_URL = "https://your-host/path-containing-the-pt-files"
 ```
 
 Full local evaluation requires the `data/embryo/` dataset, which is intentionally kept local because it is large.

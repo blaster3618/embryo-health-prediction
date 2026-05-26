@@ -5,7 +5,7 @@ Run: streamlit run src/app/streamlit_app.py   (from FYP/ root)
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-import io, base64, time
+import time
 import numpy as np
 import torch, torch.nn.functional as F
 import matplotlib
@@ -22,35 +22,46 @@ from sklearn.metrics import (accuracy_score, balanced_accuracy_score,
 
 from src.models.model_factory import build_model, get_gradcam_layer, get_input_size, SUPPORTED_ARCHS
 from src.utils.gradcam import GradCAM, generate_gradcam_figure
+from src.utils.model_store import (
+    available_archs as configured_archs,
+    ensure_model_file,
+    format_size,
+    load_class_names,
+    model_status,
+)
 
 # ── constants ────────────────────────────────────────────────────────────────
 IMAGENET_MEAN    = [0.485, 0.456, 0.406]
 IMAGENET_STD     = [0.229, 0.224, 0.225]
-SAVED_MODELS_DIR = "saved_models"
-LEGACY_PATHS     = {"resnet18": "resnet18/best.pt", "resnet50": "resnet50/best.pt"}
-CLASSES_DEFAULT  = ["NonViable", "Viable"]
 DEFAULT_ARCH     = "resnet152"
 TEST_DATA_PATH   = "data/embryo/test_data"
 
 # ── helpers ───────────────────────────────────────────────────────────────────
-def find_model_path(arch):
-    p = os.path.join(SAVED_MODELS_DIR, f"{arch}_best.pt")
-    if os.path.exists(p): return p
-    p2 = LEGACY_PATHS.get(arch)
-    return p2 if p2 and os.path.exists(p2) else None
+def apply_streamlit_secrets():
+    """Expose Streamlit secrets as env vars for the shared model loader."""
+    try:
+        secrets = st.secrets
+    except Exception:
+        return
+
+    keys = ["MODEL_BASE_URL", "MODEL_RELEASE_BASE_URL", "MODEL_CACHE_DIR"]
+    keys.extend(f"MODEL_URL_{arch.upper()}" for arch in SUPPORTED_ARCHS)
+    for key in keys:
+        if key in secrets and not os.getenv(key):
+            os.environ[key] = str(secrets[key])
+
 
 def available_archs():
-    return [a for a in SUPPORTED_ARCHS if find_model_path(a)]
+    return configured_archs(SUPPORTED_ARCHS)
 
-@st.cache_resource
+
+@st.cache_resource(show_spinner=False, max_entries=1)
 def load_model_cached(arch):
-    path = find_model_path(arch)
-    cls_file = os.path.join(SAVED_MODELS_DIR, f"{arch}_classes.txt")
-    class_names = (open(cls_file).read().splitlines()
-                   if os.path.exists(cls_file) else CLASSES_DEFAULT)
+    path = ensure_model_file(arch)
+    class_names = load_class_names(arch)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = build_model(arch, len(class_names), pretrained=False)
-    model.load_state_dict(torch.load(path, map_location=device, weights_only=True))
+    model.load_state_dict(torch.load(str(path), map_location=device, weights_only=True))
     model.to(device).eval()
     return model, class_names, device
 
@@ -66,6 +77,7 @@ def is_positive_class(label):
 
 # ── page config ───────────────────────────────────────────────────────────────
 st.set_page_config(page_title="Embryo Health Prediction", page_icon="🔬", layout="wide")
+apply_streamlit_secrets()
 st.markdown("""<style>
 .metric-box{background:rgba(255,255,255,.05);border-radius:12px;padding:16px;text-align:center}
 .big-val{font-size:2rem;font-weight:700;color:#00d4ff}
@@ -79,16 +91,20 @@ with st.sidebar:
     st.header("⚙️ Model Settings")
     avail = available_archs()
     all_archs = SUPPORTED_ARCHS.copy()
+    statuses = {a: model_status(a) for a in all_archs}
 
     default_idx = all_archs.index(DEFAULT_ARCH) if DEFAULT_ARCH in all_archs else 0
     arch = st.selectbox("Architecture", all_archs, index=default_idx,
-                        format_func=lambda a: f"{a}{'  ✅' if a in avail else '  ❌ (not trained)'}")
+                        format_func=lambda a: f"{a}{'  ✅' if a in avail else '  ❌ (not configured)'}")
     if arch in avail:
-        path = find_model_path(arch)
-        size = os.path.getsize(path) / 1024 / 1024
-        st.success(f"Model loaded – {size:.1f} MB")
+        status = statuses[arch]
+        size = format_size(status["size_bytes"])
+        if status["source"] == "remote":
+            st.info(f"Model hosted remotely – downloads on first use ({size})")
+        else:
+            st.success(f"Model ready locally – {size}")
     else:
-        st.error("Model not trained yet. Run:\n`python src/training/train.py --arch " + arch + "`")
+        st.error("Model weights are not configured. Set `MODEL_BASE_URL` or add local weights.")
 
     st.markdown("---")
     st.caption("Default model: ResNet-152")
@@ -108,7 +124,11 @@ with tab_classify:
 
         if col1.button("🔍 Analyse Embryo", disabled=(arch not in avail)):
             with st.spinner("Analysing..."):
-                model, class_names, device = load_model_cached(arch)
+                try:
+                    model, class_names, device = load_model_cached(arch)
+                except Exception as exc:
+                    st.error(f"Could not load {arch}: {exc}")
+                    st.stop()
                 tf = get_transform(arch)
                 tensor = tf(image).unsqueeze(0).to(device)
 
@@ -146,7 +166,11 @@ with tab_evaluate:
         st.warning("Evaluation data is not available in this deployment. Image classification still works.")
     if st.button("🚀 Run Evaluation", disabled=(arch not in avail or not test_data_available)):
         with st.spinner("Running evaluation on test set..."):
-            model, class_names, device = load_model_cached(arch)
+            try:
+                model, class_names, device = load_model_cached(arch)
+            except Exception as exc:
+                st.error(f"Could not load {arch}: {exc}")
+                st.stop()
             sz = get_input_size(arch)
             tf = transforms.Compose([
                 transforms.Resize((sz, sz)), transforms.ToTensor(),

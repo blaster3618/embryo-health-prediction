@@ -5,7 +5,7 @@ Run from FYP/ root: python src/app/flask_app.py
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-import io, base64, time, json
+import io, base64, time
 import numpy as np
 import torch, torch.nn.functional as F
 import matplotlib
@@ -22,19 +22,16 @@ from sklearn.metrics import (accuracy_score, balanced_accuracy_score,
 
 from src.models.model_factory import build_model, get_gradcam_layer, get_input_size, SUPPORTED_ARCHS
 from src.utils.gradcam import GradCAM, generate_gradcam_figure
+from src.utils.model_store import (
+    available_models as configured_models,
+    ensure_model_file,
+    load_class_names,
+)
 
 # ── config ────────────────────────────────────────────────────────────────────
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD  = [0.229, 0.224, 0.225]
 TEST_DATA_PATH = "data/embryo/test_data"
-CLASSES_DEFAULT = ["NonViable", "Viable"]
-
-# Legacy per-folder weights (resnet18, resnet50 already trained)
-LEGACY_PATHS = {
-    "resnet18": "resnet18/best.pt",
-    "resnet50": "resnet50/best.pt",
-}
-SAVED_MODELS_DIR = "saved_models"
 
 # Default = best observed model by evaluation accuracy/macro-F1.
 DEFAULT_ARCH = "resnet152"
@@ -47,48 +44,31 @@ os.makedirs("uploads", exist_ok=True)
 _cache: dict = {}   # arch -> (model, class_names, device)
 
 
-def _find_model_path(arch: str):
-    unified = os.path.join(SAVED_MODELS_DIR, f"{arch}_best.pt")
-    if os.path.exists(unified):
-        return unified
-    legacy = LEGACY_PATHS.get(arch)
-    if legacy and os.path.exists(legacy):
-        return legacy
-    return None
-
-
 def available_models():
-    found = {}
-    for arch in SUPPORTED_ARCHS:
-        p = _find_model_path(arch)
-        if p:
-            size_mb = round(os.path.getsize(p) / 1024 / 1024, 1)
-            found[arch] = {"path": p, "size_mb": size_mb}
-    return found
+    found = configured_models(SUPPORTED_ARCHS)
+    return {
+        arch: {
+            "source": info["source"],
+            "path": info["path"],
+            "url": info["url"],
+            "size_mb": round((info["size_bytes"] or 0) / 1024 / 1024, 1),
+        }
+        for arch, info in found.items()
+    }
 
 
 def load_arch(arch: str):
+    if arch not in SUPPORTED_ARCHS:
+        raise ValueError(f"Unknown architecture: {arch}")
     if arch in _cache:
         return _cache[arch]
-    path = _find_model_path(arch)
-    if path is None:
-        raise FileNotFoundError(f"No weights found for {arch}")
-    classes_file = os.path.join(SAVED_MODELS_DIR, f"{arch}_classes.txt")
-    if os.path.exists(classes_file):
-        with open(classes_file) as f:
-            class_names = [l.strip() for l in f if l.strip()]
-    else:
-        # Try legacy classes.txt in resnet18/ folder as fallback
-        legacy_cls = os.path.join(os.path.dirname(LEGACY_PATHS.get(arch, '')), 'classes.txt')
-        if os.path.exists(legacy_cls):
-            with open(legacy_cls) as f:
-                class_names = [l.strip() for l in f if l.strip()]
-        else:
-            class_names = CLASSES_DEFAULT
+    path = ensure_model_file(arch)
+    class_names = load_class_names(arch)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = build_model(arch, len(class_names), pretrained=False)
-    model.load_state_dict(torch.load(path, map_location=device, weights_only=True))
+    model.load_state_dict(torch.load(str(path), map_location=device, weights_only=True))
     model.to(device).eval()
+    _cache.clear()
     _cache[arch] = (model, class_names, device)
     return _cache[arch]
 

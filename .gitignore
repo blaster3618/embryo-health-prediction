@@ -4,6 +4,7 @@ __pycache__/
 venv/
 .venv/
 .tools/
+.model_cache/
 
 # Runtime artifacts
 logs/
@@ -15,9 +16,8 @@ resnet50/uploads/
 data/
 results/
 
-# Model weights. Files over 100MB require Git LFS before pushing to GitHub.
+# Model weights are hosted outside Git so Streamlit can clone without LFS.
 saved_models/*
-!saved_models/*_best.pt
 !saved_models/*_classes.txt
 
 # Legacy standalone model weights/results are local-only.

@@ -1,0 +1,77 @@
+{
+  "base_url": "https://github.com/blaster3618/embryo-health-prediction/releases/download/model-weights-v1",
+  "models": {
+    "alexnet": {
+      "filename": "alexnet_best.pt",
+      "classes_file": "alexnet_classes.txt",
+      "classes": ["bad", "good"],
+      "size_bytes": 228054689
+    },
+    "densenet121": {
+      "filename": "densenet121_best.pt",
+      "classes_file": "densenet121_classes.txt",
+      "classes": ["bad", "good"],
+      "size_bytes": 28435222
+    },
+    "densenet201": {
+      "filename": "densenet201_best.pt",
+      "classes_file": "densenet201_classes.txt",
+      "classes": ["bad", "good"],
+      "size_bytes": 73764165
+    },
+    "efficientnet_b0": {
+      "filename": "efficientnet_b0_best.pt",
+      "classes_file": "efficientnet_b0_classes.txt",
+      "classes": ["bad", "good"],
+      "size_bytes": 16343621
+    },
+    "inception_v3": {
+      "filename": "inception_v3_best.pt",
+      "classes_file": "inception_v3_classes.txt",
+      "classes": ["bad", "good"],
+      "size_bytes": 97747547
+    },
+    "mobilenet_v2": {
+      "filename": "mobilenet_v2_best.pt",
+      "classes_file": "mobilenet_v2_classes.txt",
+      "classes": ["bad", "good"],
+      "size_bytes": 9153611
+    },
+    "resnet101": {
+      "filename": "resnet101_best.pt",
+      "classes_file": "resnet101_classes.txt",
+      "classes": ["bad", "good"],
+      "size_bytes": 170648867
+    },
+    "resnet152": {
+      "filename": "resnet152_best.pt",
+      "classes_file": "resnet152_classes.txt",
+      "classes": ["bad", "good"],
+      "size_bytes": 233510429
+    },
+    "resnet18": {
+      "filename": "resnet18_best.pt",
+      "classes_file": "resnet18_classes.txt",
+      "classes": ["bad", "good"],
+      "size_bytes": 44790155
+    },
+    "resnet50": {
+      "filename": "resnet50_best.pt",
+      "classes_file": "resnet50_classes.txt",
+      "classes": ["bad", "good"],
+      "size_bytes": 94368483
+    },
+    "vgg16": {
+      "filename": "vgg16_best.pt",
+      "classes_file": "vgg16_classes.txt",
+      "classes": ["bad", "good"],
+      "size_bytes": 537087029
+    },
+    "vgg19": {
+      "filename": "vgg19_best.pt",
+      "classes_file": "vgg19_classes.txt",
+      "classes": ["bad", "good"],
+      "size_bytes": 558327925
+    }
+  }
+}
