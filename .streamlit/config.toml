@@ -2,6 +2,8 @@
 headless = true
 enableCORS = false
 enableXsrfProtection = false
+fileWatcherType = "none"
+fileWatcherType = "none"
 
 [browser]
 gatherUsageStats = false

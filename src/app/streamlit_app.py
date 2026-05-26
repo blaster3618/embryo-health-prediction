@@ -22,7 +22,6 @@ from sklearn.metrics import (accuracy_score, balanced_accuracy_score,
 
 from src.models.model_factory import build_model, get_gradcam_layer, get_input_size, SUPPORTED_ARCHS
 from src.utils.gradcam import GradCAM, generate_gradcam_figure
-from src.utils.data_store import ensure_evaluation_data, evaluation_data_status
 from src.utils.model_store import (
     available_archs as configured_archs,
     ensure_model_file,
@@ -49,9 +48,6 @@ def apply_streamlit_secrets():
         "MODEL_BASE_URL",
         "MODEL_RELEASE_BASE_URL",
         "MODEL_CACHE_DIR",
-        "EVALUATION_DATA_BASE_URL",
-        "EVALUATION_DATA_URL",
-        "DATA_CACHE_DIR",
     ]
     keys.extend(f"MODEL_URL_{arch.upper()}" for arch in SUPPORTED_ARCHS)
     for key in keys:
@@ -169,12 +165,8 @@ with tab_classify:
 # ── Evaluate ──────────────────────────────────────────────────────────────────
 with tab_evaluate:
     test_path = st.text_input("Test data path", value=TEST_DATA_PATH)
-    uses_default_path = os.path.normpath(test_path) == os.path.normpath(TEST_DATA_PATH)
-    data_status = evaluation_data_status(test_path if not uses_default_path else None)
-    test_data_available = data_status["available"]
-    if data_status["source"] == "remote":
-        st.info("Evaluation data is hosted remotely and downloads on first evaluation.")
-    elif not test_data_available:
+    test_data_available = os.path.exists(test_path)
+    if not test_data_available:
         st.warning("Evaluation data is not available. Image classification still works.")
     if st.button("🚀 Run Evaluation", disabled=(arch not in avail or not test_data_available)):
         with st.spinner("Running evaluation on test set..."):
@@ -183,12 +175,6 @@ with tab_evaluate:
             except Exception as exc:
                 st.error(f"Could not load {arch}: {exc}")
                 st.stop()
-            if uses_default_path:
-                try:
-                    test_path = str(ensure_evaluation_data())
-                except Exception as exc:
-                    st.error(f"Could not load evaluation data: {exc}")
-                    st.stop()
             sz = get_input_size(arch)
             tf = transforms.Compose([
                 transforms.Resize((sz, sz)), transforms.ToTensor(),

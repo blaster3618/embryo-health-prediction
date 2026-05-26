@@ -5,16 +5,13 @@ venv/
 .venv/
 .tools/
 .model_cache/
-.data_cache/
-release_assets/
 
 # Runtime artifacts
 logs/
 uploads/
 resnet50/uploads/
 
-# Local datasets and generated outputs
-data/
+# Generated outputs
 results/
 
 # Model weights are hosted outside Git so Streamlit can clone without LFS.

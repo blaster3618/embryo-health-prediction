@@ -1,8 +1,0 @@
-{
-  "evaluation_data": {
-    "base_url": "https://github.com/blaster3618/embryo-health-prediction/releases/download/evaluation-data-v1",
-    "filename": "embryo-test-data.zip",
-    "extract_to": "data/embryo",
-    "expected_path": "data/embryo/test_data"
-  }
-}
