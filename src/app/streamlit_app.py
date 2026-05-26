@@ -12,7 +12,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import streamlit as st
-from PIL import Image
+from PIL import Image, ImageFile
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
@@ -29,6 +29,8 @@ from src.utils.model_store import (
     load_class_names,
     model_status,
 )
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # ── constants ────────────────────────────────────────────────────────────────
 IMAGENET_MEAN    = [0.485, 0.456, 0.406]
@@ -179,22 +181,26 @@ with tab_evaluate:
             tf = transforms.Compose([
                 transforms.Resize((sz, sz)), transforms.ToTensor(),
                 transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD)])
-            ds = ImageFolder(test_path, transform=tf)
-            loader = DataLoader(ds, batch_size=64, shuffle=False, num_workers=2)
+            try:
+                ds = ImageFolder(test_path, transform=tf)
+                loader = DataLoader(ds, batch_size=64, shuffle=False, num_workers=0)
 
-            labels_all, preds_all, probs_all = [], [], []
-            bar = st.progress(0)
-            for i, (imgs, lbls) in enumerate(loader):
-                imgs = imgs.to(device)
-                with torch.no_grad():
-                    out = model(imgs)
-                    if isinstance(out, tuple): out = out[0]
-                    pr = F.softmax(out, dim=1)
-                    _, pd = torch.max(out, 1)
-                labels_all.extend(lbls.numpy())
-                preds_all.extend(pd.cpu().numpy())
-                probs_all.extend(pr.cpu().numpy())
-                bar.progress(min((i+1)/len(loader), 1.0))
+                labels_all, preds_all, probs_all = [], [], []
+                bar = st.progress(0)
+                for i, (imgs, lbls) in enumerate(loader):
+                    imgs = imgs.to(device)
+                    with torch.no_grad():
+                        out = model(imgs)
+                        if isinstance(out, tuple): out = out[0]
+                        pr = F.softmax(out, dim=1)
+                        _, pd = torch.max(out, 1)
+                    labels_all.extend(lbls.numpy())
+                    preds_all.extend(pd.cpu().numpy())
+                    probs_all.extend(pr.cpu().numpy())
+                    bar.progress(min((i+1)/len(loader), 1.0))
+            except Exception as exc:
+                st.error(f"Evaluation failed while reading test data or running inference: {exc}")
+                st.stop()
 
         y, yh, yp = np.array(labels_all), np.array(preds_all), np.array(probs_all)
         acc   = accuracy_score(y, yh)
