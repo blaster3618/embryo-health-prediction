@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-05-27T02:07:38.185702",
+  "architecture": "vgg16",
+  "model_path": "saved_models/vgg16_best.pt",
+  "test_path": "data/embryo/test_data",
+  "num_samples": 3593,
+  "classes": [
+    "bad",
+    "good"
+  ],
+  "model_size_mb": 512.206,
+  "total_parameters": 134268738,
+  "metrics": {
+    "accuracy": 0.932368,
+    "balanced_accuracy": 0.929302,
+    "macro_precision": 0.939102,
+    "macro_recall": 0.929302,
+    "macro_f1": 0.931587,
+    "mcc": 0.868349,
+    "cohens_kappa": 0.863548,
+    "roc_auc": 0.987449,
+    "pr_auc": 0.987367,
+    "log_loss": 0.142276,
+    "brier_score": 0.046439,
+    "inference_speed_ms": 0.0922
+  },
+  "per_class_specificity": {
+    "bad": 0.87338,
+    "good": 0.985224
+  },
+  "confusion_matrix": [
+    [
+      1867,
+      28
+    ],
+    [
+      215,
+      1483
+    ]
+  ]
+}

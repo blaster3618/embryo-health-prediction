@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-05-27T02:07:23.852949",
+  "architecture": "alexnet",
+  "model_path": "saved_models/alexnet_best.pt",
+  "test_path": "data/embryo/test_data",
+  "num_samples": 3593,
+  "classes": [
+    "bad",
+    "good"
+  ],
+  "model_size_mb": 217.49,
+  "total_parameters": 57012034,
+  "metrics": {
+    "accuracy": 0.944058,
+    "balanced_accuracy": 0.940996,
+    "macro_precision": 0.951227,
+    "macro_recall": 0.940996,
+    "macro_f1": 0.943405,
+    "mcc": 0.892165,
+    "cohens_kappa": 0.887125,
+    "roc_auc": 0.993077,
+    "pr_auc": 0.993225,
+    "log_loss": 0.125483,
+    "brier_score": 0.039152,
+    "inference_speed_ms": 0.1535
+  },
+  "per_class_specificity": {
+    "bad": 0.885159,
+    "good": 0.996834
+  },
+  "confusion_matrix": [
+    [
+      1889,
+      6
+    ],
+    [
+      195,
+      1503
+    ]
+  ]
+}

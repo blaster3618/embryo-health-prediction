@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-05-27T02:08:08.075000",
+  "architecture": "resnet50",
+  "model_path": "saved_models/resnet50_best.pt",
+  "test_path": "data/embryo/test_data",
+  "num_samples": 3593,
+  "classes": [
+    "bad",
+    "good"
+  ],
+  "model_size_mb": 89.997,
+  "total_parameters": 23512130,
+  "metrics": {
+    "accuracy": 0.973003,
+    "balanced_accuracy": 0.971835,
+    "macro_precision": 0.974642,
+    "macro_recall": 0.971835,
+    "macro_f1": 0.972852,
+    "mcc": 0.946473,
+    "cohens_kappa": 0.945725,
+    "roc_auc": 0.995404,
+    "pr_auc": 0.995466,
+    "log_loss": 0.082699,
+    "brier_score": 0.023208,
+    "inference_speed_ms": 0.1328
+  },
+  "per_class_specificity": {
+    "bad": 0.95053,
+    "good": 0.99314
+  },
+  "confusion_matrix": [
+    [
+      1882,
+      13
+    ],
+    [
+      84,
+      1614
+    ]
+  ]
+}

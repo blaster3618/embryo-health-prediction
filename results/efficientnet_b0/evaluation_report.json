@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-05-27T02:09:21.657539",
+  "architecture": "efficientnet_b0",
+  "model_path": "saved_models/efficientnet_b0_best.pt",
+  "test_path": "data/embryo/test_data",
+  "num_samples": 3593,
+  "classes": [
+    "bad",
+    "good"
+  ],
+  "model_size_mb": 15.586,
+  "total_parameters": 4010110,
+  "metrics": {
+    "accuracy": 0.968272,
+    "balanced_accuracy": 0.967503,
+    "macro_precision": 0.969048,
+    "macro_recall": 0.967503,
+    "macro_f1": 0.968128,
+    "mcc": 0.936549,
+    "cohens_kappa": 0.936266,
+    "roc_auc": 0.996136,
+    "pr_auc": 0.995989,
+    "log_loss": 0.08312,
+    "brier_score": 0.023687,
+    "inference_speed_ms": 0.1824
+  },
+  "per_class_specificity": {
+    "bad": 0.953475,
+    "good": 0.98153
+  },
+  "confusion_matrix": [
+    [
+      1860,
+      35
+    ],
+    [
+      79,
+      1619
+    ]
+  ]
+}

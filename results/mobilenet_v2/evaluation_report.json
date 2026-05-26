@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-05-27T02:09:16.524775",
+  "architecture": "mobilenet_v2",
+  "model_path": "saved_models/mobilenet_v2_best.pt",
+  "test_path": "data/embryo/test_data",
+  "num_samples": 3593,
+  "classes": [
+    "bad",
+    "good"
+  ],
+  "model_size_mb": 8.73,
+  "total_parameters": 2226434,
+  "metrics": {
+    "accuracy": 0.949624,
+    "balanced_accuracy": 0.947253,
+    "macro_precision": 0.954254,
+    "macro_recall": 0.947253,
+    "macro_f1": 0.949164,
+    "mcc": 0.90148,
+    "cohens_kappa": 0.898494,
+    "roc_auc": 0.992533,
+    "pr_auc": 0.992502,
+    "log_loss": 0.127444,
+    "brier_score": 0.037839,
+    "inference_speed_ms": 0.1249
+  },
+  "per_class_specificity": {
+    "bad": 0.904005,
+    "good": 0.990501
+  },
+  "confusion_matrix": [
+    [
+      1877,
+      18
+    ],
+    [
+      163,
+      1535
+    ]
+  ]
+}

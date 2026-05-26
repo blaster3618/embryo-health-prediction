@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-05-27T02:09:11.993690",
+  "architecture": "inception_v3",
+  "model_path": "saved_models/inception_v3_best.pt",
+  "test_path": "data/embryo/test_data",
+  "num_samples": 3593,
+  "classes": [
+    "bad",
+    "good"
+  ],
+  "model_size_mb": 93.219,
+  "total_parameters": 24348900,
+  "metrics": {
+    "accuracy": 0.693293,
+    "balanced_accuracy": 0.707459,
+    "macro_precision": 0.773611,
+    "macro_recall": 0.707459,
+    "macro_f1": 0.677753,
+    "mcc": 0.4765,
+    "cohens_kappa": 0.402762,
+    "roc_auc": 0.845525,
+    "pr_auc": 0.811993,
+    "log_loss": 1.876642,
+    "brier_score": 0.270853,
+    "inference_speed_ms": 0.2597
+  },
+  "per_class_specificity": {
+    "bad": 0.965842,
+    "good": 0.449077
+  },
+  "confusion_matrix": [
+    [
+      851,
+      1044
+    ],
+    [
+      58,
+      1640
+    ]
+  ]
+}

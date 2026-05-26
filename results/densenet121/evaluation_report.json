@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-05-27T02:08:47.670381",
+  "architecture": "densenet121",
+  "model_path": "saved_models/densenet121_best.pt",
+  "test_path": "data/embryo/test_data",
+  "num_samples": 3593,
+  "classes": [
+    "bad",
+    "good"
+  ],
+  "model_size_mb": 27.118,
+  "total_parameters": 6955906,
+  "metrics": {
+    "accuracy": 0.969942,
+    "balanced_accuracy": 0.968443,
+    "macro_precision": 0.972346,
+    "macro_recall": 0.968443,
+    "macro_f1": 0.969746,
+    "mcc": 0.94078,
+    "cohens_kappa": 0.939532,
+    "roc_auc": 0.99528,
+    "pr_auc": 0.9954,
+    "log_loss": 0.088661,
+    "brier_score": 0.024447,
+    "inference_speed_ms": -90.5875
+  },
+  "per_class_specificity": {
+    "bad": 0.941107,
+    "good": 0.995778
+  },
+  "confusion_matrix": [
+    [
+      1887,
+      8
+    ],
+    [
+      100,
+      1598
+    ]
+  ]
+}
