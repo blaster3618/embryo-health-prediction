@@ -71,7 +71,7 @@ class GradCAM:
 
         probs = F.softmax(output[0], dim=0)
         pred_cls = int(torch.argmax(probs))
-        confidence = float(probs[pred_cls])
+        confidence = float(probs[pred_cls].detach())
 
         if target_class is None:
             target_class = pred_cls
