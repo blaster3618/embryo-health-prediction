@@ -3,7 +3,7 @@ Unified Evaluation Script – Embryo Health Prediction
 =====================================================
 Generates comprehensive metrics for any trained architecture.
 
-Usage (run from FYP/ root):
+Usage (run from the repository root):
     python src/evaluation/evaluate.py --arch resnet18
     python src/evaluation/evaluate.py --arch vgg16 resnet50 densenet121   # multiple archs
     python src/evaluation/evaluate.py --arch vgg16 --model saved_models/vgg16_best.pt

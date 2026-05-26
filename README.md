@@ -1,185 +1,182 @@
-# 🔬 Embryo Health Prediction System (FYP2)
+# Embryo Viability Research Prototype
 
-AI-powered IVF embryo viability classification using 12 CNN architectures with Transfer Learning, Grad-CAM XAI, Flask REST API, and Streamlit frontend.
+Research prototype for embryo image viability classification using multiple CNN model architectures with Grad-CAM visual explanations. It is designed for local experimentation, model comparison, and interactive demonstration through Streamlit or Flask.
 
----
+## What Is Included
 
-## 📁 Project Structure
+- Streamlit app entrypoint: `streamlit_app.py`
+- Main Streamlit app: `src/app/streamlit_app.py`
+- Flask API/app: `src/app/flask_app.py`
+- Model architecture factory: `src/models/model_factory.py`
+- Grad-CAM utilities: `src/utils/gradcam.py`
+- Lazy model weight loader: `src/utils/model_store.py`
+- Model metadata: `config/model_manifest.json`
+- Class labels: `saved_models/*_classes.txt`
+- Legacy ResNet-50 app: `resnet50/`
 
-```
-FYP/
-├── config/hyperparams.yaml       ← Central hyperparameter config
-├── src/
-│   ├── models/model_factory.py   ← All 12 CNN architectures
-│   ├── training/train.py         ← Unified training (--arch flag)
-│   ├── evaluation/evaluate.py    ← Unified evaluation (all metrics + plots)
-│   ├── utils/gradcam.py          ← Shared Grad-CAM
-│   ├── utils/data_loader.py      ← Shared data loaders
-│   ├── data/divide.py            ← 70/15/15 dataset splitter
-│   └── app/
-│       ├── flask_app.py          ← Primary web app (all 12 models)
-│       ├── streamlit_app.py      ← Streamlit frontend
-│       └── templates/index.html  ← Flask HTML template
-├── data/embryo/                  ← Shared image dataset (train/val/test)
-├── resnet50/                     ← Pre-trained ResNet-50 (stand-alone, default)
-├── saved_models/                 ← Unified model weights ({arch}_best.pt)
-└── results/                      ← Evaluation outputs per architecture
-```
+Model weight files are not required in Git. The app can use local weights from `saved_models/` when present, or download them from the configured release URL on first use.
 
----
+This prototype is not a clinical decision system. Predictions and Grad-CAM heatmaps are intended for research review and technical validation.
 
-## ⚡ Quick Start
+## Requirements
+
+- Python 3.10 or newer
+- pip
+- Internet access if model weights are not already available locally
+
+## Local Setup
+
+From the project root:
 
 ```bash
-# 1. Install dependencies
+python -m venv venv
+source venv/bin/activate
+pip install --upgrade pip
 pip install -r requirements.txt
-
-# 2. Split dataset (if raw data available)
-python src/data/divide.py --source /path/to/raw_images --output data/embryo
-
-# 3. Train any architecture
-python src/training/train.py --arch resnet50   # primary model
-python src/training/train.py --arch resnet18
-python src/training/train.py --arch efficientnet_b0
-
-# 4. Evaluate
-python src/evaluation/evaluate.py --arch resnet50
-python src/evaluation/evaluate.py --arch resnet18
-
-# 5. Launch Flask app (all models, ResNet-50 default)
-python src/app/flask_app.py
-# → http://localhost:5000
-
-# 6. Launch Streamlit app
-streamlit run src/app/streamlit_app.py
 ```
 
----
+On Windows PowerShell:
 
-## 📂 Dataset Layout
-
-All unified training, evaluation, Flask, and Streamlit flows expect the shared image dataset under `data/embryo/`:
-
-```text
-data/embryo/
-├── train_data/
-│   ├── bad/
-│   └── good/
-├── val_data/
-│   ├── bad/
-│   └── good/
-└── test_data/
-    ├── bad/
-    └── good/
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
-Class labels are interpreted as:
-
-| Folder / Label | Meaning | UI Display |
-|---|---|---|
-| `good` | Viable embryo | ✅ GOOD |
-| `bad` | Non-viable embryo | ❌ BAD |
-
-The web UI also supports legacy `Viable` / `NonViable` labels, but the current saved model class files use `bad` and `good`.
-
----
-
-## 🧠 Supported Architectures (FYP2 §5)
-
-| # | Architecture | Input | Params (approx) | Notes |
-|---|---|---|---|---|
-| 1 | AlexNet | 224×224 | 61M | Baseline |
-| 2 | VGG16 | 224×224 | 138M | High accuracy |
-| 3 | VGG19 | 224×224 | 144M | Deeper VGG |
-| 4 | ResNet-18 | 224×224 | 11M | Lightweight |
-| 5 | ResNet-50 | 224×224 | 25M | Primary proposed model |
-| 6 | ResNet-101 | 224×224 | 44M | Deeper residual |
-| 7 | ResNet-152 | 224×224 | 60M | Deepest residual |
-| 8 | DenseNet-121 | 224×224 | 8M | Dense connectivity |
-| 9 | DenseNet-201 | 224×224 | 20M | Deeper DenseNet |
-| 10 | Inception v3 | 299×299 | 27M | Multi-scale |
-| 11 | MobileNetV2 | 224×224 | 3.4M | Lightweight |
-| 12 | EfficientNet-B0 | 224×224 | 5.3M | Efficient scaling |
-
-ResNet-152 is the current default model because it has the best observed evaluation performance in `results/` (`accuracy=0.981074`, `macro_f1=0.981002`).
-
----
-
-## 📊 Evaluation Metrics (FYP2 §9)
-
-- Accuracy · Balanced Accuracy · Precision · Recall · F1 Score  
-- Matthews Correlation Coefficient (MCC) · Cohen's Kappa  
-- ROC-AUC · PR-AUC · Log Loss · Brier Score  
-- Per-class Specificity · Inference Speed
-
----
-
-## 🔥 Grad-CAM Explainability (FYP2 §10)
-
-All architectures support Grad-CAM heatmap generation to highlight regions influencing predictions — essential for clinical transparency.
-
----
-
-## 🌐 Streamlit Community Cloud Deployment
-
-This project includes a root `streamlit_app.py` entrypoint for Streamlit Community Cloud. The cloud deployment keeps all 12 model choices available, but model weights are loaded lazily from release assets instead of being cloned through Git LFS.
-
-Deploy steps:
-
-1. Push this project to GitHub.
-2. Go to [share.streamlit.io](https://share.streamlit.io/).
-3. Click **Create app**.
-4. Select the GitHub repository and branch.
-5. Set the main file path to:
-
-```text
-streamlit_app.py
-```
-
-6. In advanced settings, use Python 3.12.
-7. Deploy the app and share the generated `streamlit.app` URL.
-
-### Model weights for cloud
-
-Git LFS bandwidth can block Streamlit before the app starts, so do not deploy `saved_models/*_best.pt` through Git. Upload the 12 weight files to a GitHub Release instead:
+## Run Streamlit Prototype
 
 ```bash
-bash scripts/upload_model_release_assets.sh
+source venv/bin/activate
+streamlit run streamlit_app.py
 ```
 
-The upload script only uses `saved_models/*_best.pt`. It does not upload legacy stand-alone files such as `resnet18/best.pt` or `resnet50/best.pt`.
+Then open the local URL shown by Streamlit, usually:
 
-If GitHub CLI is not installed, either install it and run `gh auth login`, or set a token before running the script:
+```text
+http://localhost:8501
+```
+
+## Run Flask Prototype
+
+```bash
+source venv/bin/activate
+python src/app/flask_app.py
+```
+
+Then open:
+
+```text
+http://localhost:5000
+```
+
+## Model Weights
+
+The app supports these architectures:
+
+- `alexnet`
+- `vgg16`
+- `vgg19`
+- `resnet18`
+- `resnet50`
+- `resnet101`
+- `resnet152`
+- `densenet121`
+- `densenet201`
+- `inception_v3`
+- `mobilenet_v2`
+- `efficientnet_b0`
+
+Local weights should use this naming pattern:
+
+```text
+saved_models/{architecture}_best.pt
+```
+
+Examples:
+
+```text
+saved_models/resnet152_best.pt
+saved_models/mobilenet_v2_best.pt
+```
+
+If local weights are missing, the app downloads the selected model from the base URL in `config/model_manifest.json`:
+
+```text
+https://github.com/blaster3618/embryo-health-prediction/releases/download/model-weights-v1
+```
+
+Downloaded files are cached in:
+
+```text
+.model_cache/
+```
+
+To use a different model host, set:
+
+```bash
+export MODEL_BASE_URL="https://your-host/path-containing-model-files"
+```
+
+You can also override one model at a time:
+
+```bash
+export MODEL_URL_RESNET152="https://your-host/resnet152_best.pt"
+```
+
+## Upload Model Release Assets
+
+If you need to publish the model weights to GitHub Releases:
 
 ```bash
 export GITHUB_TOKEN=your_token_here
 bash scripts/upload_model_release_assets.sh
 ```
 
-The app reads `config/model_manifest.json`, whose default base URL is:
+The upload script only uploads:
 
 ```text
-https://github.com/blaster3618/embryo-health-prediction/releases/download/model-weights-v1
+saved_models/*_best.pt
 ```
 
-At runtime, the selected model is downloaded into `.model_cache/` only when the user first selects it. Local development still uses real files under `saved_models/` when they exist.
+It does not upload legacy `resnet50/*.pt` files.
 
-If you host weights somewhere else, set this Streamlit secret or environment variable:
+## Optional Research Evaluation Data
 
-```toml
-MODEL_BASE_URL = "https://your-host/path-containing-the-pt-files"
+The evaluation tab expects test images at:
+
+```text
+data/embryo/test_data/
 ```
 
-Full local evaluation requires the `data/embryo/` dataset, which is intentionally kept local because it is large.
+Expected class folder layout:
 
----
+```text
+data/embryo/test_data/
+├── bad/
+└── good/
+```
 
-## 📂 Legacy Stand-Alone Apps
+If this folder is not present, image classification still works. Evaluation metrics are only available when a labelled test set is present locally.
 
-Pre-trained ResNet-18 and ResNet-50 each have their own self-contained apps:
+## Legacy ResNet-50 Prototype
+
+The legacy ResNet-50 prototype is kept for local use:
 
 ```bash
-
-# Stand-alone ResNet-50 app
-cd resnet50 && python app.py
+cd resnet50
+python app.py
 ```
+
+Required local files:
+
+```text
+resnet50/best.pt
+resnet50/classes.txt
+```
+
+## Notes
+
+- Keep `venv/`, `data/`, local model weights, and runtime cache files out of Git.
+- Keep `saved_models/*_classes.txt` in Git so class labels are always available.
+- Large model weights should be stored as release assets or another external file host, not as repository files.

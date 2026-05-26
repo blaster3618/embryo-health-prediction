@@ -1,6 +1,6 @@
 """
 Flask app backend – Embryo Health Prediction (all 12 architectures).
-Run from FYP/ root: python src/app/flask_app.py
+Run from the repository root: python src/app/flask_app.py
 """
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))

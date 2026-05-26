@@ -4,7 +4,7 @@ Grad-CAM Visualization for Embryo Health Prediction
 
 This script generates Grad-CAM (Gradient-weighted Class Activation Mapping)
 visualizations to explain model predictions. This is a key XAI (Explainable AI)
-technique as discussed in Chapter 2 Section 2.6.
+technique for inspecting image regions that influence predictions.
 
 Grad-CAM highlights the regions of the embryo image that most influenced
 the model's prediction, helping clinicians understand and trust AI decisions.
@@ -21,7 +21,7 @@ Usage:
 
 Based on: Selvaraju et al., "Grad-CAM: Visual Explanations from Deep Networks"
 
-Author: FYP 1 - Embryo Health Prediction Project
+Research prototype legacy Grad-CAM utility
 """
 
 import torch

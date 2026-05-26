@@ -1,7 +1,7 @@
 """
 Model Factory – Embryo Health Prediction
 =========================================
-Supports all 12 CNN architectures from FYP2 §5:
+Supports 12 CNN architectures for model comparison:
   alexnet | vgg16 | vgg19
   resnet18 | resnet50 | resnet101 | resnet152
   densenet121 | densenet201

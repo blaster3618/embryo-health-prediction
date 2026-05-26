@@ -1,6 +1,6 @@
 """
 Streamlit Frontend – Embryo Health Prediction
-Run: streamlit run src/app/streamlit_app.py   (from FYP/ root)
+Run: streamlit run src/app/streamlit_app.py   (from the repository root)
 """
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))

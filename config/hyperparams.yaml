@@ -11,7 +11,7 @@ training:
   scheduler_patience: 5
 
 data:
-  # Default paths (relative to FYP root).
+  # Default paths (relative to the repository root).
   # Override with --train / --val / --test CLI flags.
   train_path: "data/embryo/train_data"
   val_path:   "data/embryo/val_data"

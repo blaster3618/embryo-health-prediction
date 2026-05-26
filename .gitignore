@@ -9,7 +9,6 @@ venv/
 # Runtime artifacts
 logs/
 uploads/
-resnet18/uploads/
 resnet50/uploads/
 
 # Local datasets and generated outputs
@@ -21,7 +20,6 @@ saved_models/*
 !saved_models/*_classes.txt
 
 # Legacy standalone model weights/results are local-only.
-resnet18/*.pt
 resnet50/*.pt
 resnet50/*.png
 resnet50/*.csv
@@ -30,7 +28,6 @@ resnet50/*.csv
 *.pdf
 *.docx
 report_chapters/
-FYP2_High_Standard_Rubric_Aligned.md
 
 # Windows metadata
 *:Zone.Identifier

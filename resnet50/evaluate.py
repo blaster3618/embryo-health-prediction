@@ -3,7 +3,7 @@ Model Evaluation for Embryo Health Prediction
 ==============================================
 
 This script evaluates the trained ResNet-50 model on the test dataset and
-generates comprehensive performance metrics as required by thesis standards.
+generates comprehensive performance metrics for research review.
 
 COMPLETE Metrics Generated:
 - Accuracy
@@ -25,12 +25,10 @@ COMPLETE Metrics Generated:
 - Training History Plot (if available)
 - Inference Speed
 
-Based on Chapter 2 Section 2.7 - Performance Evaluation Metrics
-
 Usage:
     python evaluate.py
 
-Author: FYP 1 - Embryo Health Prediction Project
+Research prototype legacy evaluator
 """
 
 import torch

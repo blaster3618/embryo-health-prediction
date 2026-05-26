@@ -1,16 +1,14 @@
 """
-ResNet-50 Transfer Learning for Embryo Health Prediction
+ResNet-50 Transfer Learning for Embryo Viability Classification
 =========================================================
 
 This script trains a ResNet-50 model for binary classification of embryo images
 (viable vs non-viable) using transfer learning from ImageNet pretrained weights.
 
-Based on thesis requirements (Chapter 3) for AI-driven embryo health prediction in IVF.
-
-Methodology Alignment:
+Research prototype configuration:
 - Architecture: ResNet-50 (Transfer Learning)
 - Pre-training: ImageNet weights
-- Augmentation: 0-360 Rotation, Flips, Gaussian Blur (per Section 3.4.2)
+- Augmentation: 0-360 rotation, flips, Gaussian blur
 - Optimization: Adam with ReduceLROnPlateau
 - Loss: CrossEntropyLoss (compatible with ImageFolder 2-class structure)
 
@@ -25,7 +23,7 @@ Features:
 Usage:
     python train.py
 
-Author: FYP 1 - Embryo Health Prediction Project
+Research prototype legacy trainer
 """
 
 import torch

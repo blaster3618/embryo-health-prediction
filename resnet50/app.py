@@ -19,7 +19,7 @@ Usage:
     
 Then open: http://localhost:5000
 
-Author: FYP 1 - Embryo Health Prediction Project
+Research prototype legacy app
 """
 
 import os
@@ -788,7 +788,7 @@ HTML_TEMPLATE = '''
         </div>
         
         <footer>
-            FYP 1 - Embryo Health Prediction System | ResNet-50 Transfer Learning
+            Research Prototype | ResNet-50 Transfer Learning
         </footer>
     </div>
     

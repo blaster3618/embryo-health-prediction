@@ -3,7 +3,7 @@ Unified Training Script – Embryo Health Prediction
 ====================================================
 Supports all 12 CNN architectures via --arch flag.
 
-Usage (run from FYP/ root):
+Usage (run from the repository root):
     python src/training/train.py --arch resnet18
     python src/training/train.py --arch efficientnet_b0 --epochs 50
     python src/training/train.py --arch inception_v3 --batch 16
