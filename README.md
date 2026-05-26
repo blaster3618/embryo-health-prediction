@@ -159,6 +159,22 @@ data/embryo/test_data/
 
 If this folder is not present, image classification still works. Evaluation metrics are only available when a labelled test set is present locally.
 
+For hosted deployments, the evaluation test set can be published as a GitHub Release asset instead of committed to Git:
+
+```bash
+bash scripts/package_evaluation_data.sh
+export GITHUB_TOKEN=your_token_here
+bash scripts/upload_evaluation_data_release_asset.sh
+```
+
+The upload script packages and uploads only:
+
+```text
+data/embryo/test_data/
+```
+
+It does not upload the training or validation folders. Streamlit downloads and extracts this dataset on first evaluation using `config/data_manifest.json`.
+
 ## Legacy ResNet-50 Prototype
 
 The legacy ResNet-50 prototype is kept for local use:

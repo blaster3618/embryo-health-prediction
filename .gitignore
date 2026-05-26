@@ -5,6 +5,8 @@ venv/
 .venv/
 .tools/
 .model_cache/
+.data_cache/
+release_assets/
 
 # Runtime artifacts
 logs/
@@ -23,6 +25,7 @@ saved_models/*
 resnet50/*.pt
 resnet50/*.png
 resnet50/*.csv
+resnet50/evaluation_report.json
 
 # Reports and drafts
 *.pdf
