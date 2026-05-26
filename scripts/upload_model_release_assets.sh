@@ -34,7 +34,7 @@ if command -v gh >/dev/null 2>&1; then
       --title "Model weights v1" \
       --notes "PyTorch model weights for the Streamlit deployment. The app downloads these lazily instead of cloning them through Git LFS."
   fi
-  exit 1
+  exit 0
 fi
 
 if [ -z "${GITHUB_TOKEN:-}" ]; then
@@ -120,10 +120,8 @@ for asset in assets:
     name = path.name
     if name in existing_by_name:
         if replace_assets != "1":
-            raise RuntimeError(
-                f"{name} already exists on release {tag}. "
-                "Set REPLACE_ASSETS=1 if you intentionally want to replace it."
-            )
+            print(f"Skipping existing asset {name}.")
+            continue
         request("DELETE", f"{api_root}/releases/assets/{existing_by_name[name]}")
 
     url = f"{upload_url}?name={urllib.parse.quote(name)}"
